@@ -80,6 +80,7 @@ class App extends StatelessWidget {
 
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
+        // I got this bit of code from here:
         // https://stackoverflow.com/questions/59143443/how-to-make-flutter-app-font-size-independent-from-device-settings
         // This makes the font size independent of the device settings
         return MediaQuery (
@@ -2553,7 +2554,7 @@ confirm(Widget content, Function yesAction, BuildContext context) {
 
 //! --- PREVENT OVERSCROLL GLOW ---
 
-
+// I got this bit of code from here:
 // https://stackoverflow.com/questions/51119795/how-to-remove-scroll-glow
 class RemoveGlow extends ScrollBehavior {
   @override
