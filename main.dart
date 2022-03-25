@@ -8,6 +8,7 @@ import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:io';
 
+// Runs when app starts
 void main() async {
   await GetStorage.init();
   runApp(const App());
@@ -104,7 +105,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool obscurePassword = true;
+  bool obscurePassword = true; // Whether password is obscured or not
   var passwordVisibleIcon = Icon (
       Icons.remove_red_eye_outlined,
       color: activeColor
@@ -113,6 +114,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
 
+  // Login information submitted
   loginSubmit() async {
     String username = usernameController.text;
     String password = passwordController.text;
@@ -124,7 +126,8 @@ class _LoginPageState extends State<LoginPage> {
     var response = await sendRequest('login', queries, context);
         if (response['msg'] == 'bad') {
       alert('Incorrect username or password', context);
-    } else if (response['msg'] == 'success') {
+    } else if (response['msg'] == 'success') { // User has successfully logged in
+      // Write user id and name to device storage
       storage.write('userid', response['userid']);
       storage.write('username', username);
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
@@ -141,6 +144,7 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Container (
               margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height / 20, top: MediaQuery.of(context).size.height / 10),
+              // Title text
               child: Text (
                 'Chatty',
                 style: TextStyle (
@@ -149,6 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                 )
               ),
             ),
+            // Rounded box that contains page content
             Expanded (
               child: Container (
                 width: double.infinity,
@@ -167,6 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                       alignment: Alignment.centerLeft,
                       child: Container (
                         margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height / 40),
+                        // 'Sign in' text at top of container
                         child:  Text (
                           'Sign in',
                           style: TextStyle (
@@ -176,6 +182,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
+                    // Username input field
                     TextField (
                       cursorColor: textColor,
                       controller: usernameController,
@@ -214,6 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox (
                       height: MediaQuery.of(context).size.height / 35,
                     ),
+                    // Password input text field
                     TextField (
                       cursorColor: textColor,
                       controller: passwordController,
@@ -273,6 +281,7 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox (
                       height: MediaQuery.of(context).size.height / 25,
                     ),
+                    // Submit button
                     SizedBox (
                       width: double.infinity,
                       child: OutlinedButton (
@@ -298,6 +307,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const Spacer(),
+                    // Sign up text button at bottom of page
                     Row (
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -347,8 +357,8 @@ class CreateAccountPage extends StatefulWidget {
 }
 
 class _CreateAccountPageState extends State<CreateAccountPage> {
-  bool passwordObscure = true;
-  bool confirmPasswordObscure = true;
+  bool passwordObscure = true; // Whether password field is obscured
+  bool confirmPasswordObscure = true; // Whether confirm password field is obscured
   var passwordVisibleIcon = Icon (
     Icons.remove_red_eye_outlined,
     color: activeColor
@@ -363,7 +373,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   TextEditingController confirmPasswordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
 
-  Image profileImage = Image.asset('assets/default_profile.png', width: 200, height: 200, fit: BoxFit.fill);
+  Image profileImage = Image.asset('assets/default_profile.png', width: 200, height: 200, fit: BoxFit.fill); // Set profile picture to default image
   var imageFile = '';
 
   var userInfoDict = {
@@ -373,6 +383,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     'profile_picture': '',
   };
 
+  // Get image from device
   Future pickImage() async {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image == null) {
@@ -385,6 +396,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     }
   }
 
+  // Create account
   createAccountSubmit() async {
     if (usernameController.text.isNotEmpty && passwordController.text.isNotEmpty && confirmPasswordController.text.isNotEmpty && emailController.text.isNotEmpty) {
       String username = usernameController.text;
@@ -392,6 +404,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       String confirmPassword = confirmPasswordController.text;
       String email = emailController.text;
 
+      // Set profile picture to default picture or picture chosen from device
       if (imageFile == '') {
         var tempDefaultImg = await rootBundle.load('assets/default_profile.png');
         imageFile = base64Encode(Uint8List.view(tempDefaultImg.buffer));
@@ -406,6 +419,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         if (response['msg'] == 'exist') {
           alert('Username already exists', context);
         } else if (response['msg'] == 'not_exist') {
+          // Move to email verification page
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -439,6 +453,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             SizedBox (
               height: MediaQuery.of(context).size.height / 20
             ),
+            // 'Create Account' text at top of page
             Align (
               alignment: Alignment.centerLeft,
               child: Container (
@@ -452,6 +467,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 ),
               ),
             ),
+            // Username input field
             TextField (
               cursorColor: textColor,
               controller: usernameController,
@@ -490,9 +506,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             SizedBox (
               height: MediaQuery.of(context).size.height / 55,
             ),
+            // Password and confirm password input fields
             Row (
               children: [
                 Expanded (
+                  // Password input field
                   child: TextField (
                     cursorColor: textColor,
                       controller: passwordController,
@@ -553,6 +571,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 SizedBox (
                   width: MediaQuery.of(context).size.width / 100
                 ),
+                // Confirm password input field
                 Expanded (
                   child: TextField (
                     cursorColor: textColor,
@@ -616,6 +635,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             SizedBox (
               height: MediaQuery.of(context).size.height / 55,
             ),
+            // Email input field
             TextField (
               cursorColor: textColor,
               controller: emailController,
@@ -654,6 +674,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             SizedBox (
               height: MediaQuery.of(context).size.height / 40,
             ),
+            // Profile picture
             ClipRRect (
               borderRadius: BorderRadius.circular(100.0),
               child: profileImage,
@@ -661,6 +682,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             SizedBox (
               height: MediaQuery.of(context).size.height / 100
             ),
+            // Choose profile picture button
             SizedBox (
               child: OutlinedButton (
                 style: ButtonStyle (
@@ -685,6 +707,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               ),
             ),
             const Spacer(),
+            // Create account button
             SizedBox (
               width: double.infinity,
               child: OutlinedButton (
@@ -712,6 +735,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             SizedBox (
               height: MediaQuery.of(context).size.height / 80
             ),
+            // Text button that takes you to sign in
             Row (
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -756,12 +780,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List groups = List.filled(0, '', growable: true);
+  List groups = List.filled(0, '', growable: true); // List with names of groups that user is a member of
 
+  // Group creation button press
   createGroup() {
     Navigator.of(context).pushNamed('/home/create_group');
   }
 
+  // Gets group names from server
+  // Called on page init and refresh button press
   getGroups() async {
     var queries = {'id': storage.read('userid')};
     var response = await sendRequest('get_user_groups', queries, context);
@@ -771,6 +798,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // Group button is pressed
   groupPressed(String group) {
     activeGroupName = group;
     Navigator.of(context).pushNamed('/home/group');
@@ -789,6 +817,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar (
         backgroundColor: backgroundColorDark,
         elevation: 0,
+        // Refresh button
         leading: IconButton (
           icon: Icon (
             Icons.refresh,
@@ -798,6 +827,7 @@ class _HomePageState extends State<HomePage> {
           onPressed: () {
             getGroups();
         }),
+        // 'Home' text
         title: Center(
           child: Text (
             'Home',
@@ -808,6 +838,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         toolbarHeight: 65.0,
+        // Profile page button
         actions: [
           Container (
             margin: EdgeInsets.only(right: MediaQuery.of(context).size.width / 50),
@@ -826,6 +857,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Stack (
         children: [
+          // Box that contains all groups 
           Container (
             margin: const EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0, top: 0),
             decoration: BoxDecoration (
@@ -846,7 +878,7 @@ class _HomePageState extends State<HomePage> {
                   behavior: RemoveGlow(),
                   child: ListView (
                     children: [
-                      for (String group in groups)
+                      for (String group in groups) // Create button for each group
                       Container (
                         margin: const EdgeInsets.all(10.0),
                         padding: const EdgeInsets.all(0.0),
@@ -883,6 +915,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+          // Group creation button
           Container (
             margin: const EdgeInsets.all(20.0),
             child: Align (
@@ -926,15 +959,18 @@ class GroupTextPage extends StatefulWidget {
 }
 
 class _GroupTextPageState extends State<GroupTextPage> {
+  // Each list contains all information needed to display each message
   List messages = List.filled(0, '', growable: true);
   List usernames = List.filled(0, '', growable: true);
   List pfps = List.filled(0, '', growable: true);
-  bool isAdmin = false;
+  
+  bool isAdmin = false; // Whether the user is the admin of the current group
   TextEditingController messageController = TextEditingController();
   String myUsername = '';
-  ScrollController scrollController = ScrollController();
-  int numScrolled = 0;
+  ScrollController scrollController = ScrollController(); // Allows us to determine when user has scrolled to top of messages
+  int numScrolled = 0; // Number of times the user has requested messages
 
+  // Determine whether user is admin of group
   getAdmin() async {
     var queries = {
       'user_id': storage.read('userid'),
@@ -949,6 +985,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
     }
   }
 
+  // Send message to group
   sendMessage() {
     String message = messageController.text;
 
@@ -963,6 +1000,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
     }
   }
 
+  // Use socket connection on page init
   initializeSocket() {
     socket.connect();
 
@@ -970,9 +1008,10 @@ class _GroupTextPageState extends State<GroupTextPage> {
       'room': activeGroupName,
       'num_scrolled': numScrolled
     };
-    socket.emit('join_room', socketQueries);
-    socket.emit('get_messages', socketQueries);
+    socket.emit('join_room', socketQueries); // Join group on socket server
+    socket.emit('get_messages', socketQueries); // Request messages
 
+    // broadcast_message is emitted from the server when a user sends a message to the group
     socket.on('broadcast_message', (messageDict) {
       if (mounted) {
         setState(() {
@@ -982,6 +1021,8 @@ class _GroupTextPageState extends State<GroupTextPage> {
         });
       }
     });
+    
+    // get_first_messages is emitted from the server when a user loads pre-existing messages
     socket.on('get_first_messages', (messageDict) {
       if (mounted) {
         setState(() {
@@ -994,6 +1035,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
     });
   }
 
+  // Determine whether message is from current device
   isMyMessage(String username) {
     if (username == storage.read('username')) {
       return false;
@@ -1002,6 +1044,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
     }
   }
 
+  // Load past messages from server
   getMoreMessages() {
     var socketQueries = {
       'room': activeGroupName,
@@ -1016,10 +1059,11 @@ class _GroupTextPageState extends State<GroupTextPage> {
     initializeSocket();
     getAdmin();
 
+    // Add listener that checks for when the user has scrolled all the way up
     scrollController.addListener(() {
       if (scrollController.position.atEdge) {
         if (scrollController.position.pixels != 0) {
-          getMoreMessages();
+          getMoreMessages(); // Request additional messages
         }
       }
     });
@@ -1038,6 +1082,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
       appBar: AppBar (
         automaticallyImplyLeading: false,
         centerTitle: true,
+        // Back button
         leading: IconButton (
           icon: Icon (
             Icons.arrow_back,
@@ -1047,6 +1092,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
           onPressed: () {
             Navigator.of(context).pop();
         }),
+        // Title (the name of the current group)
         title: Text (
           activeGroupName,
           style: TextStyle (
@@ -1057,6 +1103,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
         toolbarHeight: 65.0,
         backgroundColor: backgroundColorDark,
         elevation: 0,
+        // Settings button
         actions: <Widget> [
           Visibility (
             visible: isAdmin,
@@ -1091,6 +1138,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
         child: Column (
           children: [
             Expanded (
+              // Container that displays messages
               child: Container (
                 decoration: BoxDecoration (
                   color: backgroundColor,
@@ -1115,18 +1163,20 @@ class _GroupTextPageState extends State<GroupTextPage> {
                           controller: scrollController,
                           itemCount: messages.length,
                           shrinkWrap: true,
-                          reverse: true,
+                          reverse: true, // Reverse ListView so the scrollbar defaults to the bottom of the page
                           itemBuilder: (BuildContext context, int i) {
                             return Container (
                               margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                               child: Stack (
                                 children: [
+                                  // This visibility displays if the message is not from the current user
                                   Visibility (
                                     visible: isMyMessage(usernames[i]),
                                     child: Row (
                                       children: [
                                         Container (
                                           margin: const EdgeInsets.only(right: 10.0),
+                                          // Profile picture
                                           child: ClipRRect (
                                             borderRadius: BorderRadius.circular(100.0),
                                             child: Image.memory(base64Decode(pfps[i]), width: 50, height: 50, fit: BoxFit.fill),
@@ -1139,6 +1189,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
                                             children: [
                                               Container (
                                                 margin: EdgeInsets.only(left: MediaQuery.of(context).size.width / 100),
+                                                // Username text
                                                 child: Text (
                                                   usernames[i],
                                                   style: TextStyle (
@@ -1147,6 +1198,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
                                                   )
                                                 ),
                                               ),
+                                              // The flexible widgets allow the text to wrap
                                               Flexible (
                                                 fit: FlexFit.loose,
                                                 child: Container (
@@ -1164,6 +1216,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
                                                     children: [
                                                       Flexible (
                                                         fit: FlexFit.loose,
+                                                        // Message text
                                                         child: Text (
                                                           messages[i],
                                                           style: TextStyle (
@@ -1182,6 +1235,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
                                       ]
                                     ),
                                   ),
+                                  // This visibility displays if the message is from the current user
                                   Visibility (
                                     visible: !isMyMessage(usernames[i]),
                                     child: Row (
@@ -1193,6 +1247,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
                                             children: [
                                               Container (
                                                 margin: EdgeInsets.only(right: MediaQuery.of(context).size.width / 100),
+                                                // Username text
                                                 child: Text (
                                                   usernames[i],
                                                   style:TextStyle (
@@ -1218,6 +1273,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
                                                     children: [
                                                       Flexible (
                                                         fit: FlexFit.loose,
+                                                        // Message text
                                                         child: Text (
                                                           messages[i],
                                                           style: TextStyle (
@@ -1235,6 +1291,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
                                         ),
                                         Container (
                                           margin: const EdgeInsets.only(left: 10.0),
+                                          // Profile picture
                                           child: ClipRRect (
                                             borderRadius: BorderRadius.circular(100.0),
                                             child: Image.memory(base64Decode(pfps[i]), width: 50, height: 50, fit: BoxFit.fill),
@@ -1257,6 +1314,7 @@ class _GroupTextPageState extends State<GroupTextPage> {
             SizedBox(
               height: MediaQuery.of(context).size.height / 60
             ),
+            // Message input text field
             TextField (
               cursorColor: textColor,
               controller: messageController,
