@@ -329,6 +329,7 @@ var server = http.createServer(function (req, res) {
         });
         req.on('end', () => {
             body = JSON.parse(buffer);
+            // Write high-res and low-res versions of photo to file
             sharp(Buffer.from(body['pfp'], 'base64')).resize({height:256, width:256}).toFile(`../storage/pfp/${username}.png`)
             sharp(Buffer.from(body['pfp'], 'base64')).resize({height:64, width:64}).toFile(`../storage/pfp_downscale/${username}.png`)
             response_dict['msg'] = 'success';
