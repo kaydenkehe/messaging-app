@@ -1369,8 +1369,9 @@ class GroupSettingsPage extends StatefulWidget {
 
 class _GroupSettingsPageState extends State<GroupSettingsPage> {
   TextEditingController usernameController = TextEditingController();
-  List<dynamic> users = List.filled(0, '', growable: true);
+  List<dynamic> users = List.filled(0, '', growable: true); // List of all users in a group
 
+  // Get all users in group from server
   getUsers() async {
     var queries = {'group_name': activeGroupName};
     var response = await sendRequest('get_users_in_group', queries, context);
@@ -1385,12 +1386,14 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     }
   }
 
+  // Add user to group
   addUser(BuildContext context) {
     showDialog (
       context: context,
       builder: (context) {
         return AlertDialog (
           backgroundColor: backgroundColor,
+          // Username text field
           content: TextField (
             controller: usernameController,
             style: TextStyle (
@@ -1420,7 +1423,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             ),
           ),
           actions: [
-            TextButton(
+            TextButton (
+              // Add user button
               child: Text (
                 'Add',
                 style: TextStyle (
@@ -1436,14 +1440,14 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     alert('User is already in group', context);
                   } else {
                     var queries = {'username': newUsername};
-                    var response = await sendRequest('check_user_existence', queries, context);
+                    var response = await sendRequest('check_user_existence', queries, context); // Make sure user exists in db
                     
                     if (response['msg'] == 'success') {
                       var queries = {
                         'username': newUsername,
                         'group_name': activeGroupName
                       };
-                      var response = await sendRequest('add_user', queries, context);
+                      var response = await sendRequest('add_user', queries, context); // Send request to add user to group in db
                       
                       if (response['msg'] == 'success') {
                       setState(() {
@@ -1467,6 +1471,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     );
   }
 
+  // Delete group
   deleteGroup() {
     confirm (
       RichText (
@@ -1503,6 +1508,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     );
   }
 
+  // Remove user from group
   deleteUser(String user) {
     confirm (
       RichText (
@@ -1571,6 +1577,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       appBar: AppBar (
         automaticallyImplyLeading: false,
         centerTitle: true,
+        // Back button
         leading: IconButton (
           icon: Icon (
             Icons.arrow_back,
@@ -1580,6 +1587,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           onPressed: () {
             Navigator.of(context).pop();
         }),
+        // Title
         title: RichText (
           text: TextSpan (
             style: TextStyle (
@@ -1613,6 +1621,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  // Add user button
                   Expanded (
                     child: SizedBox (
                       child: OutlinedButton (
@@ -1641,6 +1650,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                   SizedBox (
                     width: MediaQuery.of(context).size.width / 20
                   ),
+                  // Delete group button
                   Expanded (
                     child: SizedBox (
                       child: OutlinedButton (
@@ -1669,6 +1679,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                 ]
               ),
             ),
+            // Container where users in group are listed
             Expanded (
               child: Container (
                 margin: const EdgeInsets.all(10.0),
@@ -1713,6 +1724,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                                   ),
                                 ),
                                 const Spacer(),
+                                // Remove user button
                                 IconButton (
                                   onPressed: () => deleteUser(user),
                                   icon: const Icon(Icons.backspace_rounded),
@@ -1748,6 +1760,7 @@ class GroupLeavePage extends StatefulWidget {
 }
 
 class _GroupLeavePageState extends State<GroupLeavePage> {
+  // Remove current user from group
   removeUser() {
     confirm (
       RichText (
@@ -1776,7 +1789,7 @@ class _GroupLeavePageState extends State<GroupLeavePage> {
           'username': storage.read('username'),
           'group_name': activeGroupName
         };
-        var response = await sendRequest('remove_user', queries, context);
+        var response = await sendRequest('remove_user', queries, context); // Send request to remove user from group
         if (response['msg'] == 'success') {
           Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
         }
@@ -1793,6 +1806,7 @@ class _GroupLeavePageState extends State<GroupLeavePage> {
       appBar: AppBar (
         automaticallyImplyLeading: false,
         centerTitle: true,
+        // Back button
         leading: IconButton (
           icon: Icon (
             Icons.arrow_back,
@@ -1802,6 +1816,7 @@ class _GroupLeavePageState extends State<GroupLeavePage> {
           onPressed: () {
             Navigator.of(context).pop();
         }),
+        // Title
         title: RichText (
           text: TextSpan (
             style: TextStyle (
@@ -1829,6 +1844,7 @@ class _GroupLeavePageState extends State<GroupLeavePage> {
         margin: const EdgeInsets.all(50.0),
         child: SizedBox (
           width: double.infinity,
+          // Leave group button
           child: OutlinedButton (
             style: ButtonStyle (
               padding: MaterialStateProperty.all(const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0)),
@@ -1870,8 +1886,9 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String username = 'Name';
   String email = 'Email';
-  late Image profileImage = Image.asset('assets/default_profile.png', width: 200, height: 200, fit: BoxFit.fill);
+  late Image profileImage = Image.asset('assets/default_profile.png', width: 200, height: 200, fit: BoxFit.fill); // Set profile to default before it loads
 
+  // Get info about user
   getInfo() async {
     var queries = {'id': storage.read('userid')};
     var response = await sendRequest('get_user_info', queries, context);
@@ -1882,6 +1899,7 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  // Change profile picture
   Future changePFP() async {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image == null) {
@@ -1898,6 +1916,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Log out of app
   logout() {
     confirm (
       Text (
@@ -1927,6 +1946,7 @@ class _ProfilePageState extends State<ProfilePage> {
         automaticallyImplyLeading: false,
         centerTitle: true,
         leading: IconButton (
+          // Back button
           icon: Icon (
             Icons.arrow_back,
             size: 30.0,
@@ -1935,6 +1955,7 @@ class _ProfilePageState extends State<ProfilePage> {
           onPressed: () {
             Navigator.of(context).pop();
         }),
+        // 'Profile' title
         title: Text (
           'Profile',
           style: TextStyle (
@@ -1954,6 +1975,7 @@ class _ProfilePageState extends State<ProfilePage> {
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Username text
             Text (
               username,
               textAlign: TextAlign.start,
@@ -1968,10 +1990,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Email icon
                   Icon (
                     Icons.email,
                     color: textColorDark,
                   ),
+                  // Email text
                   Text (
                     email,
                     style: TextStyle(
@@ -1990,10 +2014,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 color: backgroundColorDark,
               ),
             ),
+            // Profile picture
             ClipRRect (
                 borderRadius: BorderRadius.circular(100.0),
                 child: profileImage,
             ),
+            // Change profile picture button
             TextButton (
               child: Text (
                 'Change Profile Picture',
@@ -2004,6 +2030,7 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: () => changePFP(),
             ),
             const Spacer(),
+            // Logout button
             Align (
               alignment: Alignment.bottomCenter,
               child: TextButton (
@@ -2038,8 +2065,9 @@ class CreateGroupPage extends StatefulWidget {
 class _CreateGroupPageState extends State<CreateGroupPage> {
   TextEditingController groupNameController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
-  List<String> users = List.filled(0, '', growable: true);
+  List<String> users = List.filled(0, '', growable: true); // List of users to be added to group
 
+  // Add user to users list
   addUser(BuildContext context) {
     showDialog (
       context: context,
@@ -2088,7 +2116,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                   if (username != storage.read('username')) {
                     if (!users.contains(username)) {
                       var queries = {'username': usernameController.text};
-                      var response = await sendRequest('check_user_existence', queries, context);
+                      var response = await sendRequest('check_user_existence', queries, context); // Make sure user exists in db
                       
                       if (response['msg'] == 'success') {
                         setState(() {
@@ -2111,6 +2139,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
     );
   }
 
+  // Create group
   createGroup() async {
     String groupName = groupNameController.text;
     if (groupName != '') {
@@ -2119,7 +2148,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
         'usernames': users.toString(),
         'group_name': groupName
       };
-      var response = await sendRequest('create_group', queries, context);
+      var response = await sendRequest('create_group', queries, context); // Send request to server to create group
       
       if (response['msg'] == 'success') {
         Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
@@ -2141,6 +2170,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
         automaticallyImplyLeading: false,
         centerTitle: true,
         leading: IconButton (
+          // Back button
           icon: Icon (
             Icons.arrow_back,
             size: 30.0,
@@ -2149,6 +2179,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
           onPressed: () {
             Navigator.of(context).pop();
         }),
+        // 'Create Group' title
         title: Text (
           'Create Group',
           style: TextStyle (
@@ -2166,6 +2197,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
           children: [
             Container (
               margin: const EdgeInsets.symmetric(horizontal: 10.0),
+              // Group name text field
               child: TextField (
                 cursorColor: textColor,
                 controller: groupNameController,
@@ -2211,6 +2243,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                   Expanded (
                     child: SizedBox (
                       child: OutlinedButton (
+                        // Add user button
                         style: ButtonStyle (
                           padding: MaterialStateProperty.all(const EdgeInsets.all(12.0)),
                           backgroundColor: MaterialStateProperty.all(activeColor),
@@ -2238,6 +2271,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                   ),
                   Expanded (
                     child: SizedBox (
+                      // Create grop button
                       child: OutlinedButton (
                         style: ButtonStyle (
                           padding: MaterialStateProperty.all(const EdgeInsets.all(12.0)),
@@ -2285,6 +2319,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                       child: ListView (
                         children: [
                           Center (
+                            // 'Users' txt
                             child: Text (
                               'Users',
                               style: TextStyle (
@@ -2294,6 +2329,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                               ),
                             ),
                           ),
+                          // Create a text and removal button for each user
                           for (String user in users)
                           Container (
                             margin: const EdgeInsets.only(left: 10.0),
@@ -2342,6 +2378,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
 class VerifyEmailPage extends StatefulWidget {
   const VerifyEmailPage({Key? key, this.username, this.password, this.email, this.pfp}) : super(key: key);
 
+  // Get information from previous page
   final String? username;
   final String? password;
   final String? email;
@@ -2354,6 +2391,7 @@ class VerifyEmailPage extends StatefulWidget {
 class _VerifyEmailPageState extends State<VerifyEmailPage> {
   TextEditingController codeController = TextEditingController();
 
+  // Submit verification code
   submitCode() {
     var socketQueries = {
       'code': codeController.text
@@ -2361,6 +2399,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     socket.emit('submit_code', socketQueries);
   }
 
+  // Send code to email
   sendCode() {
     var socketQueries = {
       'email': widget.email
@@ -2368,8 +2407,11 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
     socket.emit('email_code', socketQueries);
   }
 
+  // Start and manage the socket connection
   initSocket() {
     socket.connect();
+    
+    // Add listener for server determining if code is correct or not
     socket.on('code_response', (messageDict) async {
       if (messageDict['msg'] == 'success') {
         var queries = {
@@ -2378,15 +2420,17 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
           'password': widget.password
         };
 
-        var response = await sendRequest('create_account', queries, context);
+        var response = await sendRequest('create_account', queries, context); // Send request to create account
 
         if (response['msg'] == 'success') {
+          
+          // Write account details to local storage if account creation is successful
           storage.write('userid', response['userid']);
           storage.write('username', widget.username);
 
           var pfpQueries = {'username': widget.username};
           var pfpPostBody = {'pfp': widget.pfp!};
-          await sendRequest('set_pfp', pfpQueries, context, pfpPostBody);
+          await sendRequest('set_pfp', pfpQueries, context, pfpPostBody); // Set user profile picture
           Navigator.of(context).pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false);
         }
       } else {
@@ -2420,6 +2464,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
               margin: const EdgeInsets.only(top: 40.0),
               child: Align (
                 alignment: Alignment.topLeft,
+                // Back button
                 child: IconButton (
                   icon: Icon (
                     Icons.arrow_back,
@@ -2440,6 +2485,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                     alignment: Alignment.topCenter,
                     child: Container (
                       margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height / 40),
+                      // Text telling the user that a code has been emailed
                       child: Text (
                         'A code has been sent to ${widget.email}',
                         textAlign: TextAlign.center,
@@ -2453,6 +2499,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                   SizedBox (
                     height: MediaQuery.of(context).size.height / 70
                   ),
+                  // Code input field
                   TextField (
                     cursorColor: textColor,
                     controller: codeController,
@@ -2492,6 +2539,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                     height: MediaQuery.of(context).size.height / 50
                   ),
                   SizedBox (
+                    // Submit button
                     child: OutlinedButton (
                       style: ButtonStyle (
                         padding: MaterialStateProperty.all(const EdgeInsets.symmetric(vertical: 12.0, horizontal: 30.0)),
@@ -2514,6 +2562,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                       onPressed: () => submitCode(),
                     ),
                   ),
+                  // Resend email button
                   TextButton (
                     child: Text (
                       'Resend Email',
@@ -2535,6 +2584,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
 
 
 //! --- ALERT DIALOG WIDGET ---
+// Usually used to let the user know something has gone wrong
 
 
 alert(String message, BuildContext context) {
