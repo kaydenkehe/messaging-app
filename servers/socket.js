@@ -39,8 +39,9 @@ io.on('connection', socket => {
                 usernames = [];
                 profile_pictures = [];
                 
+                // Add the data for all the messages to the three lists
                 rows.forEach(row => {
-                    messages.push(row['content'].replaceAll('|@|', "'"));
+                    messages.push(row['content'].replaceAll('|@|', "'")); // The '|@|' is used to make the program not break when someone sends a message with a comma
                     usernames.push(row['username']);
                     profile_pictures.push(fs.readFileSync(`../storage/pfp_downscale/${row['username']}.png`, 'base64'))
                 });
@@ -80,7 +81,7 @@ io.on('connection', socket => {
                 'profile_picture': fs.readFileSync(`../storage/pfp_downscale/${username}.png`, 'base64')
             };
 
-            io.to(room).emit('broadcast_message', messageDict); // Emit message to entire room
+            io.to(room).emit('broadcast_message', messageDict); // Broadcast message to entire room
             db.close();
         });
     });
@@ -88,7 +89,7 @@ io.on('connection', socket => {
     // Email verification code
     socket.on('email_code', info_dict => {
         email = info_dict['email'];
-        socket.code = Math.floor(Math.random() * (1000000 - 100000) + 100000).toString();
+        socket.code = Math.floor(Math.random() * (1000000 - 100000) + 100000).toString(); // Create random 6 digit numerical code and attribute it to the socket connection
 
         transport = nodemailer.createTransport({
             service: 'gmail',
@@ -102,6 +103,7 @@ io.on('connection', socket => {
             text: `Your verification code is: ${socket.code}`
         };
         
+        // Send email with code
         transport.sendMail(mail_info, function(err) {
 
         });
