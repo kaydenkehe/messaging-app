@@ -78,7 +78,7 @@ io.on('connection', socket => {
             messageDict = {
                 'content': content.replaceAll('|@|', "'"),
                 'username': username,
-                'profile_picture': fs.readFileSync(`../storage/pfp_downscale/${username}.png`, 'base64')
+                'profile_picture': fs.readFileSync(`../storage/pfp_downscale/${username}.png`, 'base64') // Convert raw image data to base 64
             };
 
             io.to(room).emit('broadcast_message', messageDict); // Broadcast message to entire room
