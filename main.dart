@@ -2319,7 +2319,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                       child: ListView (
                         children: [
                           Center (
-                            // 'Users' txt
+                            // 'Users' text
                             child: Text (
                               'Users',
                               style: TextStyle (
@@ -2620,6 +2620,7 @@ alert(String message, BuildContext context) {
 
 
 //! --- CONFIRMATION DIALOG WIDGET ---
+// Used for comfirming an action
 
 
 confirm(Widget content, Function yesAction, BuildContext context) {
@@ -2661,6 +2662,7 @@ confirm(Widget content, Function yesAction, BuildContext context) {
 
 
 //! --- PREVENT OVERSCROLL GLOW ---
+
 
 // I got this bit of code from here:
 // https://stackoverflow.com/questions/51119795/how-to-remove-scroll-glow
