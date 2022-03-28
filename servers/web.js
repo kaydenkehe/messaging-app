@@ -56,7 +56,7 @@ var server = http.createServer(function (req, res) {
         db = new sqlite.Database(DBLOC);
         db.serialize(function() {
             db.all(`SELECT user_id FROM users WHERE username = '${username}'`, (err, rows) => {
-                if (rows.length > 0) {
+                if (rows.length > 0) { // Check whether content exists in DB
                     response_dict['msg'] = 'exist';
                     res.write(JSON.stringify(response_dict));
                     res.end();
@@ -252,6 +252,8 @@ var server = http.createServer(function (req, res) {
         db.serialize(function() {
             db.all(`SELECT username FROM users WHERE user_id IN (SELECT user_id FROM user_groups WHERE group_id IN (SELECT group_id FROM groups WHERE group_name = '${group_name}'));`, (err, rows) => {
                 usernames = []
+                
+                // Loop through rows and push usernames to list
                 rows.forEach(row => {
                     usernames.push(row['username']);
                 });
@@ -329,7 +331,7 @@ var server = http.createServer(function (req, res) {
         });
         req.on('end', () => {
             body = JSON.parse(buffer);
-            // Write high-res and low-res versions of photo to file
+            // Write high-res and low-res versions of photo to file as base 64
             sharp(Buffer.from(body['pfp'], 'base64')).resize({height:256, width:256}).toFile(`../storage/pfp/${username}.png`)
             sharp(Buffer.from(body['pfp'], 'base64')).resize({height:64, width:64}).toFile(`../storage/pfp_downscale/${username}.png`)
             response_dict['msg'] = 'success';
