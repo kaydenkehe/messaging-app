@@ -14,7 +14,7 @@ void main() async {
   runApp(const App());
 }
 
-String ip = '72.192.95.115'; // IP for requests and socket
+String ip = ''; // IP for requests and socket
 // Socket
 io.Socket socket = io.io('ws://$ip:8456', <String, dynamic> {
       'transports': ['websocket'],
