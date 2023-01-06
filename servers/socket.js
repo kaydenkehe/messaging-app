@@ -11,8 +11,8 @@ const io = socketio(server);
 
 const PORT = 8456
 const DBLOC = '../storage/appdb.db'; // Location of DB
-const EMAIL = 'appemailconfirmer@gmail.com';
-const PW = '$kSC?x4cFVS5zxLd';
+const EMAIL = '';
+const PW = '';
 
 
 io.on('connection', socket => {
